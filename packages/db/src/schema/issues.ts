@@ -14,6 +14,7 @@ import { projects } from "./projects.js";
 import { goals } from "./goals.js";
 import { companies } from "./companies.js";
 import { heartbeatRuns } from "./heartbeat_runs.js";
+import { approvals } from "./approvals.js";
 
 export const issues = pgTable(
   "issues",
@@ -41,6 +42,13 @@ export const issues = pgTable(
     billingCode: text("billing_code"),
     assigneeAdapterOverrides: jsonb("assignee_adapter_overrides").$type<Record<string, unknown>>(),
     executionWorkspaceSettings: jsonb("execution_workspace_settings").$type<Record<string, unknown>>(),
+    // Milestone review fields
+    isMilestone: integer("is_milestone").notNull().default(0),
+    reviewerAgentId: uuid("reviewer_agent_id").references(() => agents.id),
+    reviewerUserId: text("reviewer_user_id"),
+    reviewApprovalId: uuid("review_approval_id").references(() => approvals.id),
+    completionReport: text("completion_report"),
+    reviewSummary: text("review_summary"),
     startedAt: timestamp("started_at", { withTimezone: true }),
     completedAt: timestamp("completed_at", { withTimezone: true }),
     cancelledAt: timestamp("cancelled_at", { withTimezone: true }),
@@ -63,5 +71,10 @@ export const issues = pgTable(
     parentIdx: index("issues_company_parent_idx").on(table.companyId, table.parentId),
     projectIdx: index("issues_company_project_idx").on(table.companyId, table.projectId),
     identifierIdx: uniqueIndex("issues_identifier_idx").on(table.identifier),
+    goalMilestoneIdx: index("issues_company_goal_milestone_idx").on(
+      table.companyId,
+      table.goalId,
+      table.isMilestone,
+    ),
   }),
 );

@@ -63,6 +63,34 @@ export const AGENT_ROLE_LABELS: Record<AgentRole, string> = {
   general: "General",
 };
 
+export const AGENT_ROLE_DESCRIPTIONS: Record<AgentRole, string> = {
+  ceo: "Chief Executive Officer - Top-level decision maker reporting to the board",
+  cto: "Chief Technology Officer - Leads technology strategy and engineering teams",
+  cmo: "Chief Marketing Officer - Drives marketing strategy and growth initiatives",
+  cfo: "Chief Financial Officer - Manages financial operations and budget",
+  engineer: "Software Engineer - Develops and maintains software systems",
+  designer: "Designer - Creates user interfaces and visual designs",
+  pm: "Project Manager - Coordinates projects and team workflows",
+  qa: "Quality Assurance - Tests software and ensures quality standards",
+  devops: "DevOps Engineer - Manages deployment, CI/CD, and infrastructure",
+  researcher: "Researcher - Conducts research and gathers information",
+  general: "General Purpose - Versatile agent for various tasks",
+};
+
+export const AGENT_ROLE_ICONS: Record<AgentRole, string> = {
+  ceo: "Crown",
+  cto: "Cpu",
+  cmo: "Megaphone",
+  cfo: "DollarSign",
+  engineer: "Code",
+  designer: "Palette",
+  pm: "ClipboardList",
+  qa: "Bug",
+  devops: "Server",
+  researcher: "Search",
+  general: "Bot",
+};
+
 export const AGENT_ICON_NAMES = [
   "bot",
   "cpu",
@@ -150,7 +178,7 @@ export const PROJECT_COLORS = [
   "#3b82f6", // blue
 ] as const;
 
-export const APPROVAL_TYPES = ["hire_agent", "approve_ceo_strategy"] as const;
+export const APPROVAL_TYPES = ["hire_agent", "approve_ceo_strategy", "review_milestone"] as const;
 export type ApprovalType = (typeof APPROVAL_TYPES)[number];
 
 export const APPROVAL_STATUSES = [

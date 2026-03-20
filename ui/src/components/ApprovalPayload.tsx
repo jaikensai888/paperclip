@@ -1,13 +1,15 @@
-import { UserPlus, Lightbulb, ShieldCheck } from "lucide-react";
+import { UserPlus, Lightbulb, ShieldCheck, Flag } from "lucide-react";
 
 export const typeLabel: Record<string, string> = {
   hire_agent: "Hire Agent",
   approve_ceo_strategy: "CEO Strategy",
+  review_milestone: "Milestone Review",
 };
 
 export const typeIcon: Record<string, typeof UserPlus> = {
   hire_agent: UserPlus,
   approve_ceo_strategy: Lightbulb,
+  review_milestone: Flag,
 };
 
 export const defaultTypeIcon = ShieldCheck;
@@ -69,7 +71,41 @@ export function CeoStrategyPayload({ payload }: { payload: Record<string, unknow
   );
 }
 
+export function MilestoneReviewPayload({ payload }: { payload: Record<string, unknown> }) {
+  return (
+    <div className="mt-3 space-y-1.5 text-sm">
+      <div className="flex items-center gap-2">
+        <span className="text-muted-foreground w-24 shrink-0 text-xs">Milestone</span>
+        <span className="font-medium">{String(payload.milestoneTitle ?? "—")}</span>
+      </div>
+      {!!payload.goalTitle && (
+        <div className="flex items-center gap-2">
+          <span className="text-muted-foreground w-24 shrink-0 text-xs">Goal</span>
+          <span>{String(payload.goalTitle)}</span>
+        </div>
+      )}
+      {!!payload.completionReport && (
+        <div className="mt-2">
+          <span className="text-muted-foreground text-xs">Completion Report</span>
+          <div className="mt-1 rounded-md bg-muted/40 px-3 py-2 text-sm text-muted-foreground whitespace-pre-wrap font-mono text-xs max-h-48 overflow-y-auto">
+            {String(payload.completionReport)}
+          </div>
+        </div>
+      )}
+      {!!payload.reviewSummary && (
+        <div className="mt-2">
+          <span className="text-muted-foreground text-xs">Review Summary</span>
+          <div className="mt-1 rounded-md bg-blue-50 px-3 py-2 text-sm text-blue-900 whitespace-pre-wrap max-h-32 overflow-y-auto">
+            {String(payload.reviewSummary)}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function ApprovalPayloadRenderer({ type, payload }: { type: string; payload: Record<string, unknown> }) {
   if (type === "hire_agent") return <HireAgentPayload payload={payload} />;
+  if (type === "review_milestone") return <MilestoneReviewPayload payload={payload} />;
   return <CeoStrategyPayload payload={payload} />;
 }

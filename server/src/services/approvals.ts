@@ -1,6 +1,6 @@
 import { and, asc, eq, inArray } from "drizzle-orm";
 import type { Db } from "@paperclipai/db";
-import { approvalComments, approvals } from "@paperclipai/db";
+import { approvalComments, approvals, issues } from "@paperclipai/db";
 import { notFound, unprocessable } from "../errors.js";
 import { redactCurrentUserText } from "../log-redaction.js";
 import { agentService } from "./agents.js";
@@ -163,6 +163,23 @@ export function approvalService(db: Db) {
         const payloadAgentId = typeof payload.agentId === "string" ? payload.agentId : null;
         if (payloadAgentId) {
           await agentsSvc.terminate(payloadAgentId);
+        }
+      }
+
+      // Handle review_milestone rejection - revert task to in_progress
+      if (applied && updated.type === "review_milestone") {
+        const payload = updated.payload as Record<string, unknown>;
+        const milestoneId = typeof payload.milestoneId === "string" ? payload.milestoneId : null;
+        if (milestoneId) {
+          await db
+            .update(issues)
+            .set({
+              status: "in_progress",
+              completedAt: null,
+              reviewApprovalId: null,
+              updatedAt: new Date(),
+            })
+            .where(eq(issues.id, milestoneId));
         }
       }
 

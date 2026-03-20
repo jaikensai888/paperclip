@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "@/lib/router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { goalsApi } from "../api/goals";
@@ -15,6 +15,8 @@ import { StatusBadge } from "../components/StatusBadge";
 import { InlineEditor } from "../components/InlineEditor";
 import { EntityRow } from "../components/EntityRow";
 import { PageSkeleton } from "../components/PageSkeleton";
+import { MilestoneList } from "../components/MilestoneList";
+import { NewMilestoneDialog } from "../components/NewMilestoneDialog";
 import { projectUrl } from "../lib/utils";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -28,6 +30,7 @@ export function GoalDetail() {
   const { openPanel, closePanel } = usePanel();
   const { setBreadcrumbs } = useBreadcrumbs();
   const queryClient = useQueryClient();
+  const [newMilestoneOpen, setNewMilestoneOpen] = useState(false);
 
   const {
     data: goal,
@@ -153,6 +156,9 @@ export function GoalDetail() {
           <TabsTrigger value="projects">
             Projects ({linkedProjects.length})
           </TabsTrigger>
+          <TabsTrigger value="milestones">
+            Milestones
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="children" className="mt-4 space-y-3">
@@ -188,6 +194,30 @@ export function GoalDetail() {
                 />
               ))}
             </div>
+          )}
+        </TabsContent>
+
+        <TabsContent value="milestones" className="mt-4 space-y-3">
+          <div className="flex items-center justify-start">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setNewMilestoneOpen(true)}
+            >
+              <Plus className="h-3.5 w-3.5 mr-1.5" />
+              Add Milestone
+            </Button>
+          </div>
+          {resolvedCompanyId && goalId && (
+            <MilestoneList companyId={resolvedCompanyId} goalId={goalId} />
+          )}
+          {resolvedCompanyId && goalId && (
+            <NewMilestoneDialog
+              open={newMilestoneOpen}
+              onOpenChange={setNewMilestoneOpen}
+              companyId={resolvedCompanyId}
+              goalId={goalId}
+            />
           )}
         </TabsContent>
       </Tabs>

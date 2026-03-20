@@ -66,6 +66,7 @@ export interface IssueFilters {
   parentId?: string;
   labelId?: string;
   q?: string;
+  isMilestone?: boolean;
 }
 
 type IssueRow = typeof issues.$inferSelect;
@@ -477,6 +478,9 @@ export function issueService(db: Db) {
       }
       if (filters?.projectId) conditions.push(eq(issues.projectId, filters.projectId));
       if (filters?.parentId) conditions.push(eq(issues.parentId, filters.parentId));
+      if (filters?.isMilestone !== undefined) {
+        conditions.push(eq(issues.isMilestone, filters.isMilestone ? 1 : 0));
+      }
       if (filters?.labelId) {
         const labeledIssueIds = await db
           .select({ issueId: issueLabels.issueId })
@@ -1525,6 +1529,32 @@ export function issueService(db: Db) {
         project: a.projectId ? projectMap.get(a.projectId) ?? null : null,
         goal: a.goalId ? goalMap.get(a.goalId) ?? null : null,
       }));
+    },
+
+    completeMilestone: async (issueId: string, completionReport: string) => {
+      const issue = await db
+        .select()
+        .from(issues)
+        .where(eq(issues.id, issueId))
+        .then((rows) => rows[0] ?? null);
+
+      if (!issue) throw notFound("Issue not found");
+      if (!issue.isMilestone) throw unprocessable("Issue is not a milestone");
+      if (issue.status !== "done") throw unprocessable("Milestone must be completed first");
+
+      const now = new Date();
+      const updated = await db
+        .update(issues)
+        .set({
+          completionReport,
+          updatedAt: now,
+        })
+        .where(eq(issues.id, issueId))
+        .returning()
+        .then((rows) => rows[0]);
+
+      const [enriched] = await withIssueLabels(db, [updated]);
+      return enriched;
     },
   };
 }

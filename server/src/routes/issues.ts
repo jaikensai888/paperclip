@@ -11,12 +11,14 @@ import {
   issueDocumentKeySchema,
   upsertIssueDocumentSchema,
   updateIssueSchema,
+  completeMilestoneSchema,
 } from "@paperclipai/shared";
 import type { StorageService } from "../storage/types.js";
 import { validate } from "../middleware/validate.js";
 import {
   accessService,
   agentService,
+  approvalService,
   goalService,
   heartbeatService,
   issueApprovalService,
@@ -231,6 +233,7 @@ export function issueRoutes(db: Db, storage: StorageService) {
       parentId: req.query.parentId as string | undefined,
       labelId: req.query.labelId as string | undefined,
       q: req.query.q as string | undefined,
+      isMilestone: req.query.isMilestone === "true" ? true : req.query.isMilestone === "false" ? false : undefined,
     });
     res.json(result);
   });
@@ -1002,6 +1005,58 @@ export function issueRoutes(db: Db, storage: StorageService) {
     });
 
     res.json(released);
+  });
+
+  router.post("/issues/:id/complete-milestone", validate(completeMilestoneSchema), async (req, res) => {
+    const id = req.params.id as string;
+    const issue = await svc.getById(id);
+    if (!issue) {
+      res.status(404).json({ error: "Issue not found" });
+      return;
+    }
+    assertCompanyAccess(req, issue.companyId);
+
+    const updated = await svc.completeMilestone(id, req.body.completionReport);
+
+    // Create approval for milestone review
+    const approvalsSvc = approvalService(db);
+    const approval = await approvalsSvc.create(issue.companyId, {
+      type: "review_milestone",
+      payload: {
+        milestoneId: issue.id,
+        milestoneTitle: issue.title,
+        goalId: issue.goalId,
+        goalTitle: null,
+        completedByAgentId: issue.assigneeAgentId,
+        completionReport: req.body.completionReport,
+        reviewSummary: null,
+      },
+      status: "pending",
+      requestedByAgentId: null,
+      requestedByUserId: null,
+      decisionNote: null,
+      decidedByUserId: null,
+      decidedAt: null,
+      updatedAt: new Date(),
+    });
+
+    // Update issue with approval reference
+    await svc.update(id, { reviewApprovalId: approval.id });
+
+    const actor = getActorInfo(req);
+    await logActivity(db, {
+      companyId: issue.companyId,
+      actorType: actor.actorType,
+      actorId: actor.actorId,
+      agentId: actor.agentId,
+      runId: actor.runId,
+      action: "milestone.completed",
+      entityType: "issue",
+      entityId: issue.id,
+      details: { approvalId: approval.id, completionReport: req.body.completionReport },
+    });
+
+    res.json({ ...updated, approval });
   });
 
   router.get("/issues/:id/comments", async (req, res) => {

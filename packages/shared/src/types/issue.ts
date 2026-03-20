@@ -118,6 +118,13 @@ export interface Issue {
   billingCode: string | null;
   assigneeAdapterOverrides: IssueAssigneeAdapterOverrides | null;
   executionWorkspaceSettings: IssueExecutionWorkspaceSettings | null;
+  // Milestone review fields (stored as 0/1 in DB, converted to boolean at API boundary)
+  isMilestone: number;
+  reviewerAgentId: string | null;
+  reviewerUserId: string | null;
+  reviewApprovalId: string | null;
+  completionReport: string | null;
+  reviewSummary: string | null;
   startedAt: Date | null;
   completedAt: Date | null;
   cancelledAt: Date | null;

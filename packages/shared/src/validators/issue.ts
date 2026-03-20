@@ -42,6 +42,10 @@ export const createIssueSchema = z.object({
   assigneeAdapterOverrides: issueAssigneeAdapterOverridesSchema.optional().nullable(),
   executionWorkspaceSettings: issueExecutionWorkspaceSettingsSchema.optional().nullable(),
   labelIds: z.array(z.string().uuid()).optional(),
+  // Milestone fields
+  isMilestone: z.coerce.boolean().optional().default(false),
+  reviewerAgentId: z.string().uuid().optional().nullable(),
+  reviewerUserId: z.string().optional().nullable(),
 });
 
 export type CreateIssue = z.infer<typeof createIssueSchema>;
@@ -109,3 +113,9 @@ export const upsertIssueDocumentSchema = z.object({
 
 export type IssueDocumentFormat = z.infer<typeof issueDocumentFormatSchema>;
 export type UpsertIssueDocument = z.infer<typeof upsertIssueDocumentSchema>;
+
+export const completeMilestoneSchema = z.object({
+  completionReport: z.string().min(1, "Completion report is required"),
+});
+
+export type CompleteMilestone = z.infer<typeof completeMilestoneSchema>;

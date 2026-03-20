@@ -22,6 +22,7 @@ export const issuesApi = {
       unreadForUserId?: string;
       labelId?: string;
       q?: string;
+      isMilestone?: boolean;
     },
   ) => {
     const params = new URLSearchParams();
@@ -33,6 +34,7 @@ export const issuesApi = {
     if (filters?.unreadForUserId) params.set("unreadForUserId", filters.unreadForUserId);
     if (filters?.labelId) params.set("labelId", filters.labelId);
     if (filters?.q) params.set("q", filters.q);
+    if (filters?.isMilestone !== undefined) params.set("isMilestone", String(filters.isMilestone));
     const qs = params.toString();
     return api.get<Issue[]>(`/companies/${companyId}/issues${qs ? `?${qs}` : ""}`);
   },
@@ -90,4 +92,10 @@ export const issuesApi = {
     api.post<Approval[]>(`/issues/${id}/approvals`, { approvalId }),
   unlinkApproval: (id: string, approvalId: string) =>
     api.delete<{ ok: true }>(`/issues/${id}/approvals/${approvalId}`),
+  listMilestones: (companyId: string, goalId: string) =>
+    api.get<Issue[]>(`/companies/${companyId}/issues?goalId=${goalId}&isMilestone=true`),
+  completeMilestone: (issueId: string, completionReport: string) =>
+    api.post<Issue & { approval: Approval }>(`/issues/${issueId}/complete-milestone`, {
+      completionReport,
+    }),
 };

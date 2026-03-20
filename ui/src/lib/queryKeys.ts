@@ -24,6 +24,7 @@ export const queryKeys = {
     labels: (companyId: string) => ["issues", companyId, "labels"] as const,
     listByProject: (companyId: string, projectId: string) =>
       ["issues", companyId, "project", projectId] as const,
+    milestones: (companyId: string, goalId: string) => ["issues", companyId, "milestones", goalId] as const,
     detail: (id: string) => ["issues", "detail", id] as const,
     comments: (issueId: string) => ["issues", "comments", issueId] as const,
     attachments: (issueId: string) => ["issues", "attachments", issueId] as const,
