@@ -1105,10 +1105,10 @@ function ConfigurationTab({
       />
 
       <div>
-        <h3 className="text-sm font-medium mb-3">Permissions</h3>
+        <h3 className="text-sm font-medium mb-3">{t("agentDetail.permissions")}</h3>
         <div className="border border-border rounded-lg p-4">
           <div className="flex items-center justify-between text-sm">
-            <span>Can create new agents</span>
+            <span>{t("agentDetail.canCreateNewAgents")}</span>
             <Button
               variant={agent.permissions?.canCreateAgents ? "default" : "outline"}
               size="sm"
@@ -1193,10 +1193,11 @@ function RunsTab({
   selectedRunId: string | null;
   adapterType: string;
 }) {
+  const { t } = useTranslation("pages");
   const { isMobile } = useSidebar();
 
   if (runs.length === 0) {
-    return <p className="text-sm text-muted-foreground">No runs yet.</p>;
+    return <p className="text-sm text-muted-foreground">{t("agentDetail.noRunsYet")}</p>;
   }
 
   // Sort by created descending
@@ -1218,7 +1219,7 @@ function RunsTab({
             className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors no-underline"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
-            Back to runs
+            {t("agentDetail.backToRuns")}
           </Link>
           <RunDetail key={selectedRun.id} run={selectedRun} agentRouteId={agentRouteId} adapterType={adapterType} />
         </div>
@@ -1575,8 +1576,8 @@ function RunDetail({ run: initialRun, agentRouteId, adapterType }: { run: Heartb
               onClick={() => setSessionOpen((v) => !v)}
             >
               <ChevronRight className={cn("h-3 w-3 transition-transform", sessionOpen && "rotate-90")} />
-              Session
-              {sessionChanged && <span className="text-yellow-400 ml-1">(changed)</span>}
+              {t("agentDetail.session")}
+              {sessionChanged && <span className="text-yellow-400 ml-1">({t("agentDetail.changed")})</span>}
             </button>
             {sessionOpen && (
               <div className="px-4 pb-3 space-y-1 text-xs">
@@ -1608,8 +1609,8 @@ function RunDetail({ run: initialRun, agentRouteId, adapterType }: { run: Heartb
                       }}
                     >
                       {clearSessionsForTouchedIssues.isPending
-                        ? "clearing session..."
-                        : "clear session for these issues"}
+                        ? t("agentDetail.clearingSession")
+                        : t("agentDetail.clearSessionForIssues")}
                     </button>
                     {clearSessionsForTouchedIssues.isError && (
                       <p className="text-[11px] text-destructive mt-1">
@@ -1674,6 +1675,7 @@ function RunDetail({ run: initialRun, agentRouteId, adapterType }: { run: Heartb
 /* ---- Log Viewer ---- */
 
 function LogViewer({ run, adapterType }: { run: HeartbeatRun; adapterType: string }) {
+  const { t } = useTranslation("pages");
   const [events, setEvents] = useState<HeartbeatRunEvent[]>([]);
   const [logLines, setLogLines] = useState<Array<{ ts: string; stream: "stdout" | "stderr" | "system"; chunk: string }>>([]);
   const [loading, setLoading] = useState(true);
@@ -2041,11 +2043,11 @@ function LogViewer({ run, adapterType }: { run: HeartbeatRun; adapterType: strin
   }, [run.id]);
 
   if (loading && logLoading) {
-    return <p className="text-xs text-muted-foreground">Loading run logs...</p>;
+    return <p className="text-xs text-muted-foreground">{t("agentDetail.loadingRunLogs")}</p>;
   }
 
   if (events.length === 0 && logLines.length === 0 && !logError) {
-    return <p className="text-xs text-muted-foreground">No log events.</p>;
+    return <p className="text-xs text-muted-foreground">{t("agentDetail.noLogEvents")}</p>;
   }
 
   const levelColors: Record<string, string> = {
@@ -2064,16 +2066,16 @@ function LogViewer({ run, adapterType }: { run: HeartbeatRun; adapterType: strin
     <div className="space-y-3">
       {adapterInvokePayload && (
         <div className="rounded-lg border border-border bg-background/60 p-3 space-y-2">
-          <div className="text-xs font-medium text-muted-foreground">Invocation</div>
+          <div className="text-xs font-medium text-muted-foreground">{t("agentDetail.invocation")}</div>
           {typeof adapterInvokePayload.adapterType === "string" && (
-            <div className="text-xs"><span className="text-muted-foreground">Adapter: </span>{adapterInvokePayload.adapterType}</div>
+            <div className="text-xs"><span className="text-muted-foreground">{t("agentDetail.adapter")}: </span>{adapterInvokePayload.adapterType}</div>
           )}
           {typeof adapterInvokePayload.cwd === "string" && (
-            <div className="text-xs break-all"><span className="text-muted-foreground">Working dir: </span><span className="font-mono">{adapterInvokePayload.cwd}</span></div>
+            <div className="text-xs break-all"><span className="text-muted-foreground">{t("agentDetail.workingDir")}: </span><span className="font-mono">{adapterInvokePayload.cwd}</span></div>
           )}
           {typeof adapterInvokePayload.command === "string" && (
             <div className="text-xs break-all">
-              <span className="text-muted-foreground">Command: </span>
+              <span className="text-muted-foreground">{t("agentDetail.command")}: </span>
               <span className="font-mono">
                 {[
                   adapterInvokePayload.command,
@@ -2086,7 +2088,7 @@ function LogViewer({ run, adapterType }: { run: HeartbeatRun; adapterType: strin
           )}
           {Array.isArray(adapterInvokePayload.commandNotes) && adapterInvokePayload.commandNotes.length > 0 && (
             <div>
-              <div className="text-xs text-muted-foreground mb-1">Command notes</div>
+              <div className="text-xs text-muted-foreground mb-1">{t("agentDetail.commandNotes")}</div>
               <ul className="list-disc pl-5 space-y-1">
                 {adapterInvokePayload.commandNotes
                   .filter((value): value is string => typeof value === "string" && value.trim().length > 0)
@@ -2100,7 +2102,7 @@ function LogViewer({ run, adapterType }: { run: HeartbeatRun; adapterType: strin
           )}
           {adapterInvokePayload.prompt !== undefined && (
             <div>
-              <div className="text-xs text-muted-foreground mb-1">Prompt</div>
+              <div className="text-xs text-muted-foreground mb-1">{t("agentDetail.prompt")}</div>
               <pre className="bg-neutral-100 dark:bg-neutral-950 rounded-md p-2 text-xs overflow-x-auto whitespace-pre-wrap">
                 {typeof adapterInvokePayload.prompt === "string"
                   ? redactHomePathUserSegments(adapterInvokePayload.prompt)
@@ -2110,7 +2112,7 @@ function LogViewer({ run, adapterType }: { run: HeartbeatRun; adapterType: strin
           )}
           {adapterInvokePayload.context !== undefined && (
             <div>
-              <div className="text-xs text-muted-foreground mb-1">Context</div>
+              <div className="text-xs text-muted-foreground mb-1">{t("agentDetail.context")}</div>
               <pre className="bg-neutral-100 dark:bg-neutral-950 rounded-md p-2 text-xs overflow-x-auto whitespace-pre-wrap">
                 {JSON.stringify(redactHomePathUserSegmentsInValue(adapterInvokePayload.context), null, 2)}
               </pre>
@@ -2118,7 +2120,7 @@ function LogViewer({ run, adapterType }: { run: HeartbeatRun; adapterType: strin
           )}
           {adapterInvokePayload.env !== undefined && (
             <div>
-              <div className="text-xs text-muted-foreground mb-1">Environment</div>
+              <div className="text-xs text-muted-foreground mb-1">{t("agentDetail.environment")}</div>
               <pre className="bg-neutral-100 dark:bg-neutral-950 rounded-md p-2 text-xs overflow-x-auto whitespace-pre-wrap font-mono">
                 {formatEnvForDisplay(adapterInvokePayload.env)}
               </pre>
@@ -2129,7 +2131,7 @@ function LogViewer({ run, adapterType }: { run: HeartbeatRun; adapterType: strin
 
       <div className="flex items-center justify-between">
         <span className="text-xs font-medium text-muted-foreground">
-          Transcript ({transcript.length})
+          {t("agentDetail.transcript")} ({transcript.length})
         </span>
         <div className="flex items-center gap-2">
           <div className="inline-flex rounded-lg border border-border/70 bg-background/70 p-0.5">
@@ -2161,7 +2163,7 @@ function LogViewer({ run, adapterType }: { run: HeartbeatRun; adapterType: strin
                 lastMetricsRef.current = readScrollMetrics(container);
               }}
             >
-              Jump to live
+              {t("agentDetail.jumpToLive")}
             </Button>
           )}
           {isLive && (
@@ -2170,7 +2172,7 @@ function LogViewer({ run, adapterType }: { run: HeartbeatRun; adapterType: strin
                 <span className="animate-pulse absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-400" />
               </span>
-              Live
+              {t("agentDetail.live")}
             </span>
           )}
         </div>
@@ -2180,7 +2182,7 @@ function LogViewer({ run, adapterType }: { run: HeartbeatRun; adapterType: strin
           entries={transcript}
           mode={transcriptMode}
           streaming={isLive}
-          emptyMessage={run.logRef ? "Waiting for transcript..." : "No persisted transcript for this run."}
+          emptyMessage={run.logRef ? t("agentDetail.waitingForTranscript") : t("agentDetail.noPersistedTranscript")}
         />
         {logError && (
           <div className="mt-3 rounded-xl border border-red-500/20 bg-red-500/[0.06] px-3 py-2 text-xs text-red-700 dark:text-red-300">
@@ -2309,7 +2311,7 @@ function KeysTab({ agentId, companyId }: { agentId: string; companyId?: string }
       {newToken && (
         <div className="border border-yellow-300 dark:border-yellow-600/40 bg-yellow-50 dark:bg-yellow-500/5 rounded-lg p-4 space-y-2">
           <p className="text-sm font-medium text-yellow-700 dark:text-yellow-400">
-            API key created — copy it now, it will not be shown again.
+            {t("agentDetail.apiKeyCreated")}
           </p>
           <div className="flex items-center gap-2">
             <code className="flex-1 bg-neutral-100 dark:bg-neutral-950 rounded px-3 py-1.5 text-xs font-mono text-green-700 dark:text-green-300 truncate">
@@ -2331,7 +2333,7 @@ function KeysTab({ agentId, companyId }: { agentId: string; companyId?: string }
             >
               <Copy className="h-3.5 w-3.5" />
             </Button>
-            {copied && <span className="text-xs text-green-400">Copied!</span>}
+            {copied && <span className="text-xs text-green-400">{t("agentDetail.copied")}</span>}
           </div>
           <Button
             variant="ghost"
@@ -2339,7 +2341,7 @@ function KeysTab({ agentId, companyId }: { agentId: string; companyId?: string }
             className="text-muted-foreground text-xs"
             onClick={() => setNewToken(null)}
           >
-            Dismiss
+            {t("agentDetail.dismiss")}
           </Button>
         </div>
       )}
@@ -2348,14 +2350,14 @@ function KeysTab({ agentId, companyId }: { agentId: string; companyId?: string }
       <div className="border border-border rounded-lg p-4 space-y-3">
         <h3 className="text-xs font-medium text-muted-foreground flex items-center gap-2">
           <Key className="h-3.5 w-3.5" />
-          Create API Key
+          {t("agentDetail.createApiKey")}
         </h3>
         <p className="text-xs text-muted-foreground">
-          API keys allow this agent to authenticate calls to the Paperclip server.
+          {t("agentDetail.apiKeysDescription")}
         </p>
         <div className="flex items-center gap-2">
           <Input
-            placeholder="Key name (e.g. production)"
+            placeholder={t("agentDetail.keyNamePlaceholder")}
             value={newKeyName}
             onChange={(e) => setNewKeyName(e.target.value)}
             className="h-8 text-sm"
@@ -2369,22 +2371,22 @@ function KeysTab({ agentId, companyId }: { agentId: string; companyId?: string }
             disabled={createKey.isPending}
           >
             <Plus className="h-3.5 w-3.5 mr-1" />
-            Create
+            {t("agentDetail.create")}
           </Button>
         </div>
       </div>
 
       {/* Active keys */}
-      {isLoading && <p className="text-sm text-muted-foreground">Loading keys...</p>}
+      {isLoading && <p className="text-sm text-muted-foreground">{t("agentDetail.loadingKeys")}</p>}
 
       {!isLoading && activeKeys.length === 0 && !newToken && (
-        <p className="text-sm text-muted-foreground">No active API keys.</p>
+        <p className="text-sm text-muted-foreground">{t("agentDetail.noActiveApiKeys")}</p>
       )}
 
       {activeKeys.length > 0 && (
         <div>
           <h3 className="text-xs font-medium text-muted-foreground mb-2">
-            Active Keys
+            {t("agentDetail.activeKeys")}
           </h3>
           <div className="border border-border rounded-lg divide-y divide-border">
             {activeKeys.map((key: AgentKey) => (
@@ -2392,7 +2394,7 @@ function KeysTab({ agentId, companyId }: { agentId: string; companyId?: string }
                 <div>
                   <span className="text-sm font-medium">{key.name}</span>
                   <span className="text-xs text-muted-foreground ml-3">
-                    Created {formatDate(key.createdAt)}
+                    {t("agentDetail.created")} {formatDate(key.createdAt)}
                   </span>
                 </div>
                 <Button
@@ -2402,7 +2404,7 @@ function KeysTab({ agentId, companyId }: { agentId: string; companyId?: string }
                   onClick={() => revokeKey.mutate(key.id)}
                   disabled={revokeKey.isPending}
                 >
-                  Revoke
+                  {t("agentDetail.revoke")}
                 </Button>
               </div>
             ))}
@@ -2414,7 +2416,7 @@ function KeysTab({ agentId, companyId }: { agentId: string; companyId?: string }
       {revokedKeys.length > 0 && (
         <div>
           <h3 className="text-xs font-medium text-muted-foreground mb-2">
-            Revoked Keys
+            {t("agentDetail.revokedKeys")}
           </h3>
           <div className="border border-border rounded-lg divide-y divide-border opacity-50">
             {revokedKeys.map((key: AgentKey) => (
@@ -2422,7 +2424,7 @@ function KeysTab({ agentId, companyId }: { agentId: string; companyId?: string }
                 <div>
                   <span className="text-sm line-through">{key.name}</span>
                   <span className="text-xs text-muted-foreground ml-3">
-                    Revoked {key.revokedAt ? formatDate(key.revokedAt) : ""}
+                    {t("agentDetail.revoked")} {key.revokedAt ? formatDate(key.revokedAt) : ""}
                   </span>
                 </div>
               </div>
