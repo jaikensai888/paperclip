@@ -235,6 +235,26 @@
     "revokedKeys": "已撤销密钥",
     "revoked": "撤销于"
   },
+  "newAgent": {
+    "title": "新建代理",
+    "description": "高级代理配置",
+    "agentName": "代理名称",
+    "titlePlaceholder": "职位（例如：工程副总裁）",
+    "reportsTo": "汇报给 {{name}}",
+    "reportsToNA": "汇报对象：不适用 (CEO)",
+    "reportsToSelect": "汇报给...",
+    "noManager": "无上级",
+    "thisWillBeCEO": "这将是 CEO",
+    "cancel": "取消",
+    "creating": "创建中…",
+    "createAgent": "创建代理",
+    "failedToCreate": "创建代理失败",
+    "openCodeModelRequired": "OpenCode 需要明确指定 provider/model 格式的模型。",
+    "failedToLoadOpenCodeModels": "加载 OpenCode 模型失败。",
+    "openCodeModelsLoading": "OpenCode 模型仍在加载中，请稍后重试。",
+    "noOpenCodeModels": "未发现 OpenCode 模型。请运行 `opencode models` 并进行身份验证。",
+    "openCodeModelUnavailable": "配置的 OpenCode 模型不可用：{{model}}"
+  },
   "settings": {
     "title": "公司设置",
     "noCompanySelected": "未选择公司。请从上方切换器中选择一个公司。",

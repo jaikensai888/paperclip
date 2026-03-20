@@ -236,6 +236,26 @@
     "revokedKeys": "Revoked Keys",
     "revoked": "Revoked"
   },
+  "newAgent": {
+    "title": "New Agent",
+    "description": "Advanced agent configuration",
+    "agentName": "Agent name",
+    "titlePlaceholder": "Title (e.g. VP of Engineering)",
+    "reportsTo": "Reports to {{name}}",
+    "reportsToNA": "Reports to: N/A (CEO)",
+    "reportsToSelect": "Reports to...",
+    "noManager": "No manager",
+    "thisWillBeCEO": "This will be the CEO",
+    "cancel": "Cancel",
+    "creating": "Creating…",
+    "createAgent": "Create agent",
+    "failedToCreate": "Failed to create agent",
+    "openCodeModelRequired": "OpenCode requires an explicit model in provider/model format.",
+    "failedToLoadOpenCodeModels": "Failed to load OpenCode models.",
+    "openCodeModelsLoading": "OpenCode models are still loading. Please wait and try again.",
+    "noOpenCodeModels": "No OpenCode models discovered. Run `opencode models` and authenticate providers.",
+    "openCodeModelUnavailable": "Configured OpenCode model is unavailable: {{model}}"
+  },
   "settings": {
     "title": "Company Settings",
     "noCompanySelected": "No company selected. Select a company from the switcher above.",
