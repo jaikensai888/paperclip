@@ -1,0 +1,40 @@
+{
+  "buttons": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "submit": "Submit",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "getStarted": "Get Started",
+    "createHere": "Create one here"
+  },
+  "labels": {
+    "loading": "Loading...",
+    "search": "Search",
+    "settings": "Settings",
+    "selectCompany": "Select company"
+  },
+  "status": {
+    "backlog": "Backlog",
+    "todo": "Todo",
+    "inProgress": "In Progress",
+    "done": "Done",
+    "cancelled": "Cancelled"
+  },
+  "priority": {
+    "urgent": "Urgent",
+    "high": "High",
+    "medium": "Medium",
+    "low": "Low",
+    "none": "None"
+  },
+  "units": {
+    "live": "live",
+    "running": "running",
+    "paused": "paused",
+    "errors": "errors",
+    "open": "open",
+    "blocked": "blocked"
+  }
+}

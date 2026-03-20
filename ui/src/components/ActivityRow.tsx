@@ -95,9 +95,17 @@ export function ActivityRow({ event, agentMap, entityNameMap, entityTitleMap, cl
     ? (event.details as Record<string, unknown> | null)?.agentId as string | undefined
     : undefined;
 
-  const name = isHeartbeatEvent
+  const details = event.details as Record<string, unknown> | null;
+
+  // For deleted entities, use the title from details if not in entityNameMap
+  const entityKey = `${event.entityType}:${event.entityId}`;
+  let name = isHeartbeatEvent
     ? (heartbeatAgentId ? entityNameMap.get(`agent:${heartbeatAgentId}`) : null)
-    : entityNameMap.get(`${event.entityType}:${event.entityId}`);
+    : entityNameMap.get(entityKey);
+
+  if (!name && details?.title) {
+    name = String(details.title);
+  }
 
   const entityTitle = entityTitleMap?.get(`${event.entityType}:${event.entityId}`);
 

@@ -97,6 +97,7 @@ export function goalRoutes(db: Db) {
       action: "goal.deleted",
       entityType: "goal",
       entityId: goal.id,
+      details: { title: goal.title },
     });
 
     res.json(goal);

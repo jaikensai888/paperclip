@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Link } from "@/lib/router";
-import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from 'react-i18next';
+import { Link, useNavigate } from "@/lib/router";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import type { Goal } from "@paperclipai/shared";
 import { GOAL_STATUSES, GOAL_LEVELS } from "@paperclipai/shared";
 import { agentsApi } from "../api/agents";
@@ -12,10 +13,12 @@ import { formatDate, cn, agentUrl } from "../lib/utils";
 import { Separator } from "@/components/ui/separator";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
+import { Trash2 } from "lucide-react";
 
 interface GoalPropertiesProps {
   goal: Goal;
   onUpdate?: (data: Record<string, unknown>) => void;
+  onDelete?: () => void;
 }
 
 function PropertyRow({ label, children }: { label: string; children: React.ReactNode }) {
@@ -70,8 +73,12 @@ function PickerButton({
   );
 }
 
-export function GoalProperties({ goal, onUpdate }: GoalPropertiesProps) {
+export function GoalProperties({ goal, onUpdate, onDelete }: GoalPropertiesProps) {
+  const { t } = useTranslation('pages');
   const { selectedCompanyId } = useCompany();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [isDeleting, setIsDeleting] = useState(false);
 
   const { data: agents } = useQuery({
     queryKey: queryKeys.agents.list(selectedCompanyId!),
@@ -92,6 +99,26 @@ export function GoalProperties({ goal, onUpdate }: GoalPropertiesProps) {
   const parentGoal = goal.parentId
     ? allGoals?.find((g) => g.id === goal.parentId)
     : null;
+
+  const deleteGoal = useMutation({
+    mutationFn: () => goalsApi.update(goal.id, { status: "cancelled" }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.goals.list(selectedCompanyId!) });
+      queryClient.invalidateQueries({ queryKey: queryKeys.goals.detail(goal.id) });
+      if (onDelete) {
+        onDelete();
+      } else {
+        navigate("/goals");
+      }
+    },
+  });
+
+  const handleDelete = () => {
+    if (window.confirm(t('goals.deleteConfirm', { title: goal.title }))) {
+      setIsDeleting(true);
+      deleteGoal.mutate();
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -159,6 +186,22 @@ export function GoalProperties({ goal, onUpdate }: GoalPropertiesProps) {
           <span className="text-sm">{formatDate(goal.updatedAt)}</span>
         </PropertyRow>
       </div>
+
+      {goal.status !== "cancelled" && (
+        <>
+          <Separator />
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full text-destructive hover:text-destructive"
+            onClick={handleDelete}
+            disabled={isDeleting || deleteGoal.isPending}
+          >
+            <Trash2 className="h-3.5 w-3.5 mr-1.5" />
+            {t('goals.delete')}
+          </Button>
+        </>
+      )}
     </div>
   );
 }

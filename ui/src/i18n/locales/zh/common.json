@@ -1,0 +1,40 @@
+{
+  "buttons": {
+    "save": "保存",
+    "cancel": "取消",
+    "submit": "提交",
+    "delete": "删除",
+    "edit": "编辑",
+    "create": "创建",
+    "getStarted": "开始使用",
+    "createHere": "在此创建"
+  },
+  "labels": {
+    "loading": "加载中...",
+    "search": "搜索",
+    "settings": "设置",
+    "selectCompany": "选择公司"
+  },
+  "status": {
+    "backlog": "待办",
+    "todo": "待处理",
+    "inProgress": "进行中",
+    "done": "已完成",
+    "cancelled": "已取消"
+  },
+  "priority": {
+    "urgent": "紧急",
+    "high": "高",
+    "medium": "中",
+    "low": "低",
+    "none": "无"
+  },
+  "units": {
+    "live": "运行中",
+    "running": "运行中",
+    "paused": "已暂停",
+    "errors": "错误",
+    "open": "开放",
+    "blocked": "阻塞"
+  }
+}

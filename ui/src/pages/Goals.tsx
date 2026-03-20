@@ -1,5 +1,6 @@
 import { useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useTranslation } from 'react-i18next';
 import { goalsApi } from "../api/goals";
 import { useCompany } from "../context/CompanyContext";
 import { useDialog } from "../context/DialogContext";
@@ -10,15 +11,18 @@ import { EmptyState } from "../components/EmptyState";
 import { PageSkeleton } from "../components/PageSkeleton";
 import { Button } from "@/components/ui/button";
 import { Target, Plus } from "lucide-react";
+import type { Goal } from "@paperclipai/shared";
 
 export function Goals() {
+  const { t } = useTranslation('pages');
   const { selectedCompanyId } = useCompany();
   const { openNewGoal } = useDialog();
   const { setBreadcrumbs } = useBreadcrumbs();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
-    setBreadcrumbs([{ label: "Goals" }]);
-  }, [setBreadcrumbs]);
+    setBreadcrumbs([{ label: t('goals.title') }]);
+  }, [setBreadcrumbs, t]);
 
   const { data: goals, isLoading, error } = useQuery({
     queryKey: queryKeys.goals.list(selectedCompanyId!),
@@ -26,8 +30,20 @@ export function Goals() {
     enabled: !!selectedCompanyId,
   });
 
+  const updateGoalStatus = useMutation({
+    mutationFn: ({ goalId, status }: { goalId: string; status: string }) =>
+      goalsApi.update(goalId, { status }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.goals.list(selectedCompanyId!) });
+    },
+  });
+
+  const handleStatusChange = (goal: Goal, status: string) => {
+    updateGoalStatus.mutate({ goalId: goal.id, status });
+  };
+
   if (!selectedCompanyId) {
-    return <EmptyState icon={Target} message="Select a company to view goals." />;
+    return <EmptyState icon={Target} message={t('goals.selectCompany')} />;
   }
 
   if (isLoading) {
@@ -41,8 +57,8 @@ export function Goals() {
       {goals && goals.length === 0 && (
         <EmptyState
           icon={Target}
-          message="No goals yet."
-          action="Add Goal"
+          message={t('goals.noGoals')}
+          action={t('goals.addGoal')}
           onAction={() => openNewGoal()}
         />
       )}
@@ -52,10 +68,10 @@ export function Goals() {
           <div className="flex items-center justify-start">
             <Button size="sm" variant="outline" onClick={() => openNewGoal()}>
               <Plus className="h-3.5 w-3.5 mr-1.5" />
-              New Goal
+              {t('goals.newGoal')}
             </Button>
           </div>
-          <GoalTree goals={goals} goalLink={(goal) => `/goals/${goal.id}`} />
+          <GoalTree goals={goals} goalLink={(goal) => `/goals/${goal.id}`} onStatusChange={handleStatusChange} />
         </>
       )}
     </div>

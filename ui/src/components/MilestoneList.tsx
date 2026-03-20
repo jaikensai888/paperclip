@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { useTranslation } from 'react-i18next';
 import { issuesApi } from "../api/issues";
 import { queryKeys } from "../lib/queryKeys";
 import { EntityRow } from "./EntityRow";
@@ -27,40 +28,41 @@ function isMilestoneBool(issue: Issue): boolean {
   return issue.isMilestone === 1;
 }
 
-function ReviewStatusBadge({ status }: { status: ReturnType<typeof getMilestoneReviewStatus> }) {
+function ReviewStatusBadge({ status, t }: { status: ReturnType<typeof getMilestoneReviewStatus>; t: (key: string) => string }) {
   switch (status) {
     case "pending":
       return (
         <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
           <Clock className="h-3 w-3 mr-1" />
-          Pending Review
+          {t('milestones.pendingReview')}
         </Badge>
       );
     case "approved":
       return (
         <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
           <CheckCircle className="h-3 w-3 mr-1" />
-          Approved
+          {t('milestones.approved')}
         </Badge>
       );
     case "rejected":
       return (
         <Badge variant="outline" className="bg-red-50 text-red-700 border-red-200">
           <XCircle className="h-3 w-3 mr-1" />
-          Rejected
+          {t('milestones.rejected')}
         </Badge>
       );
     default:
       return (
         <Badge variant="outline" className="bg-gray-50 text-gray-600 border-gray-200">
           <AlertCircle className="h-3 w-3 mr-1" />
-          Not Completed
+          {t('milestones.notCompleted')}
         </Badge>
       );
   }
 }
 
 export function MilestoneList({ companyId, goalId }: MilestoneListProps) {
+  const { t } = useTranslation('pages');
   const { data: milestones, isLoading } = useQuery({
     queryKey: queryKeys.issues.milestones(companyId, goalId),
     queryFn: () => issuesApi.listMilestones(companyId, goalId),
@@ -68,11 +70,11 @@ export function MilestoneList({ companyId, goalId }: MilestoneListProps) {
   });
 
   if (isLoading) {
-    return <p className="text-sm text-muted-foreground">Loading milestones...</p>;
+    return <p className="text-sm text-muted-foreground">{t('milestones.loading')}</p>;
   }
 
   if (!milestones || milestones.length === 0) {
-    return <p className="text-sm text-muted-foreground">No milestones defined.</p>;
+    return <p className="text-sm text-muted-foreground">{t('milestones.noMilestones')}</p>;
   }
 
   return (
@@ -89,7 +91,7 @@ export function MilestoneList({ companyId, goalId }: MilestoneListProps) {
             trailing={
               <div className="flex items-center gap-2">
                 <StatusBadge status={milestone.status} />
-                <ReviewStatusBadge status={reviewStatus} />
+                <ReviewStatusBadge status={reviewStatus} t={t} />
               </div>
             }
           />
